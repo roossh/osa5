@@ -34,7 +34,7 @@ const App = () => {
       setUser(user)
       blogService.setToken(user.token)
     }
-  })
+  }, [])
 
   const notify = (message, type='notification') => {
     setNotification({ message, type })
@@ -70,6 +70,7 @@ const App = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault()
+    blogFormRef.current.toggleVisibility()
     try {
       const blogObject = await blogService.create({
         title: title.value, author: author.value, url:url.value, user,
