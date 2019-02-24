@@ -6,15 +6,17 @@ import LoginForm from './components/LoginForm'
 import Togglable from './components/Togglable'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import { useField } from './hooks'
 
 const App = () => {
+
   const [blogs, setBlogs] = useState([])
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
+  const username = useField('text')
+  const password = useField('password')
+  const title = useField('text')
+  const author = useField('text')
+  const url = useField('text')
   const [user, setUser] = useState(null)
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
   const [notification, setNotification] = useState({
     message: null
   })
@@ -22,7 +24,7 @@ const App = () => {
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs )
-    )  
+    )
   }, [])
 
   useEffect(() => {
@@ -35,34 +37,26 @@ const App = () => {
   })
 
   const notify = (message, type='notification') => {
-    setNotification({message, type})
-    setTimeout(() => setNotification({message:null}), 5000)
-  }
-
-  const handleUsernameChange = (event) => {
-    setUsername(event.target.value)
-  }
-
-  const handlePasswordChange = (event) => {
-    setPassword(event.target.value)
+    setNotification({ message, type })
+    setTimeout(() => setNotification({ message: null }), 5000)
   }
 
   const handleLogin = async (event) => {
     event.preventDefault()
     try {
       const user = await loginService.login({
-        username, password,
-    })
+        username: username.value, password: password.value,
+      })
 
-    window.localStorage.setItem(
-      'loggedBlogappUser', JSON.stringify(user)
-    )
-
-    setUser(user)
-    setUsername('')
-    setPassword('')
+      window.localStorage.setItem(
+        'loggedBlogappUser', JSON.stringify(user)
+      )
+      blogService.setToken(user.token)
+      setUser(user)
+      username.reset()
+      password.reset()
     } catch (exception) {
-      notify(`Käyttäjätunnus tai salasana virheellinen!`, 'error')
+      notify('Käyttäjätunnus tai salasana virheellinen!', 'error')
     }
 
   }
@@ -71,38 +65,25 @@ const App = () => {
     event.preventDefault()
     window.localStorage.removeItem('loggedBlogappUser')
     setUser(null)
-    notify(`Kirjauduttu ulos!`, 'notification')
+    notify('Kirjauduttu ulos!', 'notification')
   }
 
   const handleSubmit = async (event) => {
     event.preventDefault()
     try {
       const blogObject = await blogService.create({
-        title, author, url, user,
+        title: title.value, author: author.value, url:url.value, user,
       })
       setBlogs(blogs.concat(blogObject))
-      notify(`Uusi blogi ${title} lisätty`, 'notification')
-      setTitle('')
-      setAuthor('')
-      setUrl('')
-
+      notify(`Uusi blogi ${title.value} lisätty`, 'notification')
+      title.reset()
+      author.reset()
+      url.reset()
     } catch (exception) {
-      notify(`Virhe blogin lisäyksessä!`, 'error')
+      notify('Virhe blogin lisäyksessä!', 'error')
     }
   }
 
-  const handleTitleChange = (event) => {
-    setTitle(event.target.value)
-  }
-
-  const handleAuthorChange = (event) => {
-    setAuthor(event.target.value)
-  }
-  
-  const handleUrlChange = (event) => {
-    setUrl(event.target.value)
-  }
-  
   const handleLike = (blog) => {
     const blogObject = {
       id: blog.id,
@@ -134,8 +115,6 @@ const App = () => {
   const loginForm = () => (
     <LoginForm
       handleLogin={handleLogin}
-      handleUsernameChange={handleUsernameChange}
-      handlePasswordChange={handlePasswordChange}
       username={username}
       password={password}
     />
@@ -160,9 +139,6 @@ const App = () => {
         title = {title}
         author = {author}
         url = {url}
-        handleAuthorChange = {handleAuthorChange}
-        handleTitleChange = {handleTitleChange}
-        handleUrlChange = {handleUrlChange}
       />
     </Togglable>
   )

@@ -1,30 +1,19 @@
 import React from 'react'
 
-const BlogForm = ({ onSubmit, title, author, url, handleAuthorChange, handleTitleChange, handleUrlChange }) => {
+const BlogForm = ({ onSubmit, title, author, url }) => {
+  const inputTitle = { value:title.value, type:title.type, onChange:title.onChange }
+  const inputAuthor = { value:author.value, type:author.type, onChange:author.onChange }
+  const inputUrl = { value:url.value, type:url.type, onChange:url.onChange }
+
   return (
     <form onSubmit={onSubmit}>
       <div>
         Title:
-        <input
-          type="text"
-          value={title}
-          name="Title"
-          onChange={handleTitleChange}
-        />
+        <input {...inputTitle} />
         Author:
-        <input
-          type="text"
-          value={author}
-          name="Title"
-          onChange={handleAuthorChange}
-        />
+        <input {...inputAuthor} />
         URL:
-        <input
-          type="text"
-          value={url}
-          name="Title"
-          onChange={handleUrlChange}
-        />
+        <input {...inputUrl} />
       </div>
       <button type="submit">tallenna</button>
     </form>
