@@ -35,7 +35,7 @@ const Blog = ({ blog, handleLike, handleDelete, user }) => {
   )
   return(
     <div style={blogStyle}>
-      <div onClick={() => setVisible(!visible)}>
+      <div onClick={() => setVisible(!visible)} className={'clickable'}>
         {visible ? fullBlog() : simpleBlog()}
       </div>
     </div>
